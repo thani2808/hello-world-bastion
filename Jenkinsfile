@@ -7,7 +7,7 @@ pipeline {
         CONTAINER_NAME = "hello-world-bastion-container"
         DOCKER_PORT = "9002"
         HOST_PORT = "9002"
-        BASTION_IP = "ec2-3-111-111-111.compute-1.amazonaws.com"
+        BASTION_IP = "ec2-13-201-31-196.compute-1.amazonaws.com"
         BASTION_USER = "ubuntu"
     }
 
@@ -44,14 +44,20 @@ pipeline {
             }
         }
 
-        stage('Push Docker Image to DockerHub') {
+        stage('Tag & Push Docker Image to DockerHub') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     bat """
                         echo Logging in to DockerHub...
-                        echo %DOCKERHUB_PASS% | docker login -u %DOCKERHUB_USER% --password-stdin
-                        docker tag ${IMAGE_NAME} ${DOCKERHUB_REPO}
-                        docker push ${DOCKERHUB_REPO}
+                        echo %DOCKER_PASSWORD% | docker login -u %DOCKER_USERNAME% --password-stdin
+
+                        echo Tagging the image...
+                        docker tag ${IMAGE_NAME}:latest ${DOCKERHUB_REPO}:latest
+
+                        echo Pushing the image to DockerHub...
+                        docker push ${DOCKERHUB_REPO}:latest
+
+                        echo Logging out from DockerHub...
                         docker logout
                     """
                 }
@@ -67,13 +73,13 @@ pipeline {
                             echo "🔧 Cleaning old Docker container..."
                             docker stop ${CONTAINER_NAME} || true
                             docker rm ${CONTAINER_NAME} || true
-                            docker rmi ${DOCKERHUB_REPO} || true
+                            docker rmi ${DOCKERHUB_REPO}:latest || true
 
                             echo "📥 Pulling latest image from DockerHub..."
-                            docker pull ${DOCKERHUB_REPO}
+                            docker pull ${DOCKERHUB_REPO}:latest
 
                             echo "🚀 Running container..."
-                            docker run -d --name ${CONTAINER_NAME} -p ${HOST_PORT}:${DOCKER_PORT} ${DOCKERHUB_REPO}
+                            docker run -d --name ${CONTAINER_NAME} -p ${HOST_PORT}:${DOCKER_PORT} ${DOCKERHUB_REPO}:latest
                         EOF
                     """
                 }
