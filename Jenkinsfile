@@ -84,7 +84,7 @@ EOF
 		}
             }
         }
-/*
+
         stage('Health Check on Bastion') {
             steps {
                 echo "🩺 Running health check..."
@@ -109,7 +109,7 @@ EOF
                 }
             }
         }
-*/
+
         stage('Success Confirmation') {
             steps {
                 echo '✅ Docker image deployed successfully on bastion EC2!'
