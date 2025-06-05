@@ -93,6 +93,8 @@ EOF
             	sh """
                 	ssh-keyscan -H ${BASTION_IP} >> ~/.ssh/known_hosts
                 	ssh -i $keyf $username@${BASTION_IP} << EOF
+#!/bin/bash
+set -x
 echo "⏳ Waiting for container to be healthy..."
 retries=10
 for i in \$(seq 1 \$retries); do
