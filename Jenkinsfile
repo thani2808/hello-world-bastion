@@ -69,7 +69,7 @@ pipeline {
                 echo "🚀 Connecting to Bastion EC2 and deploying Docker container..."
 		withCredentials([sshUserPrivateKey(credentialsId: 'testing', keyFileVariable: "keyf", usernameVariable: 'username')]) {
                     sh """
-                        ssh -i $keyf ${username}@${BASTION_IP} << 'EOF'
+                        ssh -vvv -i $keyf ${username}@${BASTION_IP} << 'EOF'
                             echo "🔧 Cleaning old Docker container..."
                             docker stop ${CONTAINER_NAME} || true
                             docker rm ${CONTAINER_NAME} || true
