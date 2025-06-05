@@ -46,7 +46,7 @@ pipeline {
 
 	stage('Tag & Push Docker Image to DockerHub') {
 	    steps {
-	        withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+	        withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
 	            bat """
 	                echo Logging in to DockerHub...
 	                echo %DOCKER_PASSWORD% | docker login -u %DOCKER_USERNAME% --password-stdin || exit /b
