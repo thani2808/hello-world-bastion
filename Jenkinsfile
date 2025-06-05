@@ -70,7 +70,7 @@ pipeline {
 		withCredentials([sshUserPrivateKey(credentialsId: 'testing', keyFileVariable: "keyf", usernameVariable: 'username')]) {
                     sh """
 			ssh-keyscan -H ${BASTION_IP} >> ~/.ssh/known_hosts
-                        ssh -i $keyf ${username}@${BASTION_IP} << 'EOF'
+                        ssh -i $keyf ${username}@${BASTION_IP} << EOF
                             echo "🔧 Cleaning old Docker container..."
                             docker stop ${CONTAINER_NAME} || true
                             docker rm ${CONTAINER_NAME} || true
