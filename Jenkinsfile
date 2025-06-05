@@ -71,17 +71,16 @@ pipeline {
                     sh """
 			ssh-keyscan -H ${BASTION_IP} >> ~/.ssh/known_hosts
                         ssh -i $keyf ${username}@${BASTION_IP} << EOF
-                            echo "🔧 Cleaning old Docker container..."
-                            docker stop ${CONTAINER_NAME} || true
-                            docker rm ${CONTAINER_NAME} || true
-                            docker rmi ${DOCKERHUB_REPO}:latest || true
-
-                            echo "📥 Pulling latest image from DockerHub..."
-                            docker pull ${DOCKERHUB_REPO}:latest
-
-                            echo "🚀 Running container..."
-                            docker run -d --name ${CONTAINER_NAME} -p ${HOST_PORT}:${DOCKER_PORT} ${DOCKERHUB_REPO}:latest
-EOF """
+echo "🔧 Cleaning old Docker container..."
+docker stop ${CONTAINER_NAME} || true
+docker rm ${CONTAINER_NAME} || true
+docker rmi ${DOCKERHUB_REPO}:latest || true
+echo "📥 Pulling latest image from DockerHub..."
+docker pull ${DOCKERHUB_REPO}:latest
+echo "🚀 Running container..."
+docker run -d --name ${CONTAINER_NAME} -p ${HOST_PORT}:${DOCKER_PORT} ${DOCKERHUB_REPO}:latest
+EOF 
+			"""
 		}
             }
         }
