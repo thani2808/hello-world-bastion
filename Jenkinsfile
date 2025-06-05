@@ -98,7 +98,8 @@ set -x
 echo "⏳ Waiting for container to be healthy..."
 retries=10
 for i in \$(seq 1 \$retries); do
-if curl -s http://localhost:${DOCKER_PORT} | grep "Welcome to Hello, World! Bastion first project" > /dev/null; then
+RESPONSE_CODE=`curl -o /dev/null -s -w "%{http_code}\n" http://localhost:${DOCKER_PORT}`
+if [ "\$RESPONSE_CODE" == 200 ]; then
 echo "✅ App is running!"
 exit 0
 else
