@@ -96,13 +96,13 @@ EOF
 echo "⏳ Waiting for container to be healthy..."
 retries=10
 for i in \$(seq 1 \$retries); do
-        if curl -s http://localhost:${DOCKER_PORT} | grep "Welcome to Hello, World! Bastion first project" > /dev/null; then
-	echo "✅ App is running!"
-        exit 0
-    else
-        echo "Retry \$i/\$retries - App not ready yet."
-        sleep 5
-    fi
+if curl -s http://localhost:${DOCKER_PORT} | grep "Welcome to Hello, World! Bastion first project" > /dev/null; then
+echo "✅ App is running!"
+exit 0
+else
+echo "Retry \$i/\$retries - App not ready yet."
+sleep 5
+fi
 done
 echo "❌ App did not start properly."
 exit 1
