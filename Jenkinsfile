@@ -67,9 +67,9 @@ pipeline {
         stage('SSH to Bastion and Run Container') {
             steps {
                 echo "🚀 Connecting to Bastion EC2 and deploying Docker container..."
-                sshagent(['bastion-ssh-key']) {
+		withCredentials([sshUserPrivateKey(credentialsId: 'testing', keyFileVariable: "keyf", usernameVariable: 'username')]) {
                     sh """
-                        ssh -o StrictHostKeyChecking=no ${BASTION_USER}@${BASTION_IP} << 'EOF'
+                        ssh -i $keyf ${username}@${BASTION_IP} << 'EOF'
                             echo "🔧 Cleaning old Docker container..."
                             docker stop ${CONTAINER_NAME} || true
                             docker rm ${CONTAINER_NAME} || true
@@ -82,7 +82,7 @@ pipeline {
                             docker run -d --name ${CONTAINER_NAME} -p ${HOST_PORT}:${DOCKER_PORT} ${DOCKERHUB_REPO}:latest
                         EOF
                     """
-                }
+		}
             }
         }
 
