@@ -44,25 +44,25 @@ pipeline {
             }
         }
 
-        stage('Tag & Push Docker Image to DockerHub') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    bat """
-                        echo Logging in to DockerHub...
-                        echo %DOCKER_PASSWORD% | docker login -u %DOCKER_USERNAME% --password-stdin
+	stage('Tag & Push Docker Image to DockerHub') {
+	    steps {
+	        withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+	            bat """
+	                echo Logging in to DockerHub...
+	                echo %DOCKER_PASSWORD% | docker login -u %DOCKER_USERNAME% --password-stdin || exit /b
 
-                        echo Tagging the image...
-                        docker tag ${IMAGE_NAME}:latest ${DOCKERHUB_REPO}:latest
+	                echo Tagging image...
+	                docker tag ${IMAGE_NAME} ${DOCKERHUB_REPO}:latest || exit /b
 
-                        echo Pushing the image to DockerHub...
-                        docker push ${DOCKERHUB_REPO}:latest
+	                echo Pushing image to DockerHub...
+	                docker push ${DOCKERHUB_REPO}:latest || exit /b
 
-                        echo Logging out from DockerHub...
-                        docker logout
-                    """
-                }
-            }
-        }
+	                echo Logging out from DockerHub...
+	                docker logout
+	            """
+	        }
+	    }
+	}
 
         stage('SSH to Bastion and Run Container') {
             steps {
