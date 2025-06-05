@@ -79,7 +79,7 @@ echo "📥 Pulling latest image from DockerHub..."
 docker pull ${DOCKERHUB_REPO}:latest
 echo "🚀 Running container..."
 docker run -d --name ${CONTAINER_NAME} -p ${HOST_PORT}:${DOCKER_PORT} ${DOCKERHUB_REPO}:latest
-EOF 
+EOF
 			"""
 		}
             }
