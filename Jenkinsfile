@@ -96,7 +96,7 @@ EOF
 echo "⏳ Waiting for container to be healthy..."
 retries=10
 for i in \$(seq 1 \$retries); do
-        if curl -s http://localhost:${DOCKER_PORT} | grep '"status":"UP"' > /dev/null; then
+        if curl -s http://localhost:${DOCKER_PORT} | grep "Welcome to Hello, World! Bastion first project" > /dev/null; then
 	echo "✅ App is running!"
         exit 0
     else
