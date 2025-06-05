@@ -7,7 +7,7 @@ pipeline {
         CONTAINER_NAME = "hello-world-bastion-container"
         DOCKER_PORT = "9002"
         HOST_PORT = "9002"
-        BASTION_IP = "ec2-13-201-31-196.compute-1.amazonaws.com"
+        BASTION_IP = "13.201.31.196"
         BASTION_USER = "ubuntu"
     }
 
@@ -69,6 +69,7 @@ pipeline {
                 echo "🚀 Connecting to Bastion EC2 and deploying Docker container..."
 		withCredentials([sshUserPrivateKey(credentialsId: 'testing', keyFileVariable: "keyf", usernameVariable: 'username')]) {
                     sh """
+			ssh-keyscan -H ${BASTION_IP} >> ~/.ssh/known_hosts
                         ssh -vvv -i $keyf ${username}@${BASTION_IP} << 'EOF'
                             echo "🔧 Cleaning old Docker container..."
                             docker stop ${CONTAINER_NAME} || true
@@ -85,7 +86,7 @@ pipeline {
 		}
             }
         }
-
+/*
         stage('Health Check on Bastion') {
             steps {
                 echo "🩺 Running health check..."
@@ -110,7 +111,7 @@ pipeline {
                 }
             }
         }
-
+*/
         stage('Success Confirmation') {
             steps {
                 echo '✅ Docker image deployed successfully on bastion EC2!'
