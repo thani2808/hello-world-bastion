@@ -94,10 +94,10 @@ EOF
                 	ssh-keyscan -H ${BASTION_IP} >> ~/.ssh/known_hosts
                 	ssh -i $keyf $username@${BASTION_IP} << EOF
 echo "⏳ Waiting for container to be healthy..."
-retries=5
+retries=10
 for i in \$(seq 1 \$retries); do
-    if curl -s http://localhost:${DOCKER_PORT} > /dev/null; then
-        echo "✅ App is running!"
+        if curl -s http://localhost:${DOCKER_PORT}/actuator/health | grep '"status":"UP"' > /dev/null; then
+	echo "✅ App is running!"
         exit 0
     else
         echo "Retry \$i/\$retries - App not ready yet."
