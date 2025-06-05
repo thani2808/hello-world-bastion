@@ -85,30 +85,32 @@ EOF
             }
         }
 
-        stage('Health Check on Bastion') {
-            steps {
-                echo "🩺 Running health check..."
-                sshagent(['bastion-ssh-key']) {
-                    sh """
-                        ssh -o StrictHostKeyChecking=no ${BASTION_USER}@${BASTION_IP} << 'EOF'
-                            echo "⏳ Waiting for container to be healthy..."
-                            retries=5
-                            for i in \$(seq 1 \$retries); do
-                                if curl -s http://localhost:${HOST_PORT} > /dev/null; then
-                                    echo "✅ App is running!"
-                                    exit 0
-                                else
-                                    echo "Retry \$i/\$retries - App not ready yet."
-                                    sleep 5
-                                fi
-                            done
-                            echo "❌ App did not start properly."
-                            exit 1
-                        EOF
-                    """
-                }
-            }
+
+	stage('Health Check on Bastion') {
+    		steps {
+        		echo "🩺 Running health check..."
+        		withCredentials([sshUserPrivateKey(credentialsId: 'testing', keyFileVariable: "keyf", usernameVariable: 'username')]) {
+            	sh """
+                	ssh-keyscan -H ${BASTION_IP} >> ~/.ssh/known_hosts
+                	ssh -i $keyf $username@${BASTION_IP} << EOF
+echo "⏳ Waiting for container to be healthy..."
+retries=5
+for i in \$(seq 1 \$retries); do
+    if curl -s http://localhost:${DOCKER_PORT} > /dev/null; then
+        echo "✅ App is running!"
+        exit 0
+    else
+        echo "Retry \$i/\$retries - App not ready yet."
+        sleep 5
+    fi
+done
+echo "❌ App did not start properly."
+exit 1
+EOF
+            """
         }
+    }
+}
 
         stage('Success Confirmation') {
             steps {
