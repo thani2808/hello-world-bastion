@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = "hello-world-bastion-app"
+        DOCKERHUB_REPO = "thani2808/hello-world-bastion-app"
         CONTAINER_NAME = "hello-world-bastion-container"
         DOCKER_PORT = "9002"
         HOST_PORT = "9002"
@@ -48,20 +49,39 @@ pipeline {
             }
         }
 
-        stage('Stop and Remove Old Container') {
+        stage('Tag and Push to DockerHub') {
             steps {
-                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
                     bat """
-                        docker stop ${CONTAINER_NAME} 2>nul || exit 0
-                        docker rm ${CONTAINER_NAME} 2>nul || exit 0
+                        echo Logging in to DockerHub...
+                        echo %DOCKERHUB_PASS% | docker login -u %DOCKERHUB_USER% --password-stdin
+                        docker tag ${IMAGE_NAME} ${DOCKERHUB_REPO}
+                        docker push ${DOCKERHUB_REPO}
+                        docker logout
                     """
                 }
             }
         }
 
-        stage('Run Docker Container') {
+        stage('Clean Local Container & Image') {
             steps {
-                bat "docker run -d --name ${CONTAINER_NAME} -p ${HOST_PORT}:${DOCKER_PORT} ${IMAGE_NAME}"
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    bat """
+                        docker stop ${CONTAINER_NAME} 2>nul || exit 0
+                        docker rm ${CONTAINER_NAME} 2>nul || exit 0
+                        docker rmi ${DOCKERHUB_REPO} 2>nul || exit 0
+                        docker rmi ${IMAGE_NAME} 2>nul || exit 0
+                    """
+                }
+            }
+        }
+
+        stage('Run Container from DockerHub') {
+            steps {
+                bat """
+                    docker pull ${DOCKERHUB_REPO}
+                    docker run -d --name ${CONTAINER_NAME} -p ${HOST_PORT}:${DOCKER_PORT} ${DOCKERHUB_REPO}
+                """
             }
         }
 
@@ -93,7 +113,7 @@ pipeline {
 
         stage('Success Confirmation') {
             steps {
-                echo '✅ Hello World Bastion Spring Boot app has been deployed successfully via Docker!'
+                echo '✅ Docker image pushed to DockerHub and deployed successfully from remote!'
             }
         }
     }
