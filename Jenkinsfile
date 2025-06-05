@@ -7,6 +7,8 @@ pipeline {
         CONTAINER_NAME = "hello-world-bastion-container"
         DOCKER_PORT = "9002"
         HOST_PORT = "9002"
+        DOCKERHUB_USER = "thani2808"
+        DOCKERHUB_PASS = "Thani@01"
     }
 
     stages {
@@ -51,15 +53,13 @@ pipeline {
 
         stage('Tag and Push to DockerHub') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
-                    bat """
-                        echo Logging in to DockerHub...
-                        echo %DOCKERHUB_PASS% | docker login -u %DOCKERHUB_USER% --password-stdin
-                        docker tag ${IMAGE_NAME} ${DOCKERHUB_REPO}
-                        docker push ${DOCKERHUB_REPO}
-                        docker logout
-                    """
-                }
+                bat """
+                    echo Logging in to DockerHub...
+                    echo ${DOCKERHUB_PASS} | docker login -u ${DOCKERHUB_USER} --password-stdin
+                    docker tag ${IMAGE_NAME} ${DOCKERHUB_REPO}
+                    docker push ${DOCKERHUB_REPO}
+                    docker logout
+                """
             }
         }
 
@@ -104,6 +104,7 @@ pipeline {
                             sleep(time: 5, unit: 'SECONDS')
                         }
                     }
+
                     if (!success) {
                         error "❌ Spring Boot app did not become healthy in time."
                     }
