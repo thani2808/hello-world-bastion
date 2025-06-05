@@ -7,8 +7,8 @@ pipeline {
         CONTAINER_NAME = "hello-world-bastion-container"
         DOCKER_PORT = "9002"
         HOST_PORT = "9002"
-        DOCKERHUB_USER = "thani2808"
-        DOCKERHUB_PASS = "Thani@01"
+        DOCKERHUB_USER = "thanigai2808"
+        DOCKERHUB_PASS = "Thanigai@01"
     }
 
     stages {
