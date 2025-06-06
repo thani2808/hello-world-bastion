@@ -5,8 +5,8 @@ pipeline {
         IMAGE_NAME = "hello-world-bastion-app"
         DOCKERHUB_REPO = "thanigai2808/hello-world-bastion-app"
         CONTAINER_NAME = "hello-world-bastion-container"
-        DOCKER_PORT = "9002"
-        HOST_PORT = "9002"
+        DOCKER_PORT = "9004"
+        HOST_PORT = "9004"
         BASTION_IP = "13.201.31.196"
         BASTION_USER = "ubuntu"
     }
