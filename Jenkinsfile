@@ -68,8 +68,9 @@ pipeline {
             steps {
                 echo "🚀 Connecting to Bastion EC2 and deploying Docker container..."
 		withCredentials([sshUserPrivateKey(credentialsId: 'testing', keyFileVariable: "keyf", usernameVariable: 'username')]) {
-			sh 'ssh-keyscan -H ' + BASTION_IP + ' >> ~/.ssh/known_hosts'
-			sh 'ssh -i ' + keyf + ' -o StrictHostKeyChecking=no ' + username + '@' + BASTION_IP + ''' << EOF
+	sh """
+			ssh-keyscan -H ${BASTION_IP} >> ~/.ssh/known_hosts
+			ssh -i ${keyf} -o StrictHostKeyChecking=no ${username}@${BASTION_IP} << EOF
 echo "🔧 Cleaning old Docker container..."
 docker stop ${CONTAINER_NAME} || true
 docker rm ${CONTAINER_NAME} || true
@@ -79,7 +80,7 @@ docker pull ${DOCKERHUB_REPO}:latest
 echo "🚀 Running container..."
 docker run -d --name ${CONTAINER_NAME} -p ${HOST_PORT}:${DOCKER_PORT} ${DOCKERHUB_REPO}:latest
 EOF
-'''
+	"""
 		}
             }
         }
