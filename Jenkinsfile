@@ -7,7 +7,7 @@ pipeline {
         CONTAINER_NAME = "hello-world-bastion-container"
         DOCKER_PORT = "9009"
         HOST_PORT = "9009"
-        BASTION_IP = "13.127.48.207"
+        BASTION_IP = "43.204.24.238"
         BASTION_USER = "ubuntu"
     }
 
