@@ -11,7 +11,7 @@ WORKDIR /app
 COPY target/*.jar app.jar
 
 # Expose port (must match Spring Boot server.port)
-EXPOSE 9002
+EXPOSE 9004
 
 # Start the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
